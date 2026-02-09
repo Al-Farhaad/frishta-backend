@@ -11,7 +11,9 @@ connectDB();
 const app = express();
 app.use(cors());
 
+console.log("defining clerk webhook route");
 app.use("/api/webhooks/clerk", clerkWebhook);
+console.log("clerk webhook route defined");
 
 app.use("/api/songs", express.json(), songRoutes);
 
