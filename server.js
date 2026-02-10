@@ -17,7 +17,6 @@ console.log("clerk webhook route defined");
 
 app.use("/api/songs", express.json(), songRoutes);
 
-
 app.get("/", (req, res) => {
   res.send("Frishta Backend Running");
 });

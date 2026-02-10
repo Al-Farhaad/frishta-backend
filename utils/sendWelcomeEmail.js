@@ -1,8 +1,7 @@
 const nodemailer = require("nodemailer");
 
-module.exports = async (user) => {
+ async function sendWelcomeEmail(email) {
   try {
-    const email = user.email_addresses[0].email_address;
     console.log("📧 Sending welcome email to:", email);
 
     const transporter = nodemailer.createTransport({
@@ -27,3 +26,5 @@ module.exports = async (user) => {
     console.error("❌ EMAIL FAILED:", err.message);
   }
 };
+
+module.exports = {sendWelcomeEmail};

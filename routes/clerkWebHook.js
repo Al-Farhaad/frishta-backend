@@ -1,6 +1,6 @@
 const express = require("express");
 const { Webhook } = require("svix");
-const sendWelcomeEmail = require("../utils/sendWelcomeEmail");
+const {sendWelcomeEmail} = require("../utils/sendWelcomeEmail");
 
 const router = express.Router();
 
@@ -14,9 +14,9 @@ router.post(
       const headers = req.headers;
       const secret = process.env.CLERK_WEBHOOK_SECRET;
 
-      console.log("headers:", headers);
-      console.log("Secret length:", secret?.length);
-      console.log("Payload type:", typeof payload, "is Buffer:", Buffer.isBuffer(payload));
+      // console.log("headers:", headers);
+      // console.log("Secret length:", secret?.length);
+      // console.log("Payload type:", typeof payload, "is Buffer:", Buffer.isBuffer(payload));
     
       // return res.status(200).json({ success: true });
 
@@ -36,9 +36,14 @@ router.post(
 
       console.log("Clerk Webhook Verified:", evt.type);
 
-      if (evt.type === "user.created") {
-        await sendWelcomeEmail(evt.data);
-      }
+      console.log("checking evt.type:", evt.type);
+      // if (evt.type === "user.created") {
+      
+        const email = evt.data.email_addresses[0].email_address;
+        console.log("sending email to new user:", email);
+        await sendWelcomeEmail(email);
+        console.log("Welcome email sent to:", email);
+      // }
 
       return res.status(200).json({ success: true });
       
