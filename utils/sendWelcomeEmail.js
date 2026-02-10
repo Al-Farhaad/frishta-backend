@@ -1,3 +1,5 @@
+import nodemailer from "nodemailer";
+
 module.exports = async (user) => {
   try {
     const email = user.email_addresses[0].email_address;
