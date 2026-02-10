@@ -25,6 +25,7 @@ router.post(
         return res.status(500).json({ error: "Server configuration missing" });
       }
 
+      console.log("Verifying Clerk Webhook with secret:", secret);
       const wh = new Webhook(secret);
 
       const evt = wh.verify(payload, {
