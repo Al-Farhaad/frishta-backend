@@ -8,7 +8,7 @@ router.post(
   "/",
   express.raw({ type: "application/json" }),
   async (req, res) => {
-    console.log("Received Clerk Webhook:",req);
+    // console.log("Received Clerk Webhook:",req);
     try {
       const payload = req.body;
       const headers = req.headers;
@@ -18,7 +18,7 @@ router.post(
       console.log("Secret length:", secret?.length);
       console.log("Payload type:", typeof payload, "is Buffer:", Buffer.isBuffer(payload));
     
-      return res.status(200).json({ success: true });
+      // return res.status(200).json({ success: true });
 
       if (!secret) {
         console.error("CLERK_WEBHOOK_SECRET is missing");
