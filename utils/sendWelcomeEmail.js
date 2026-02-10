@@ -1,36 +1,55 @@
 const nodemailer = require("nodemailer");
 
-const sendWelcomeEmail = async (toEmail) => {
+const SONGS = [
+  {
+    id: "1",
+    title: "Midnight Vibes",
+    image: "https://picsum.photos/300?1"
+  },
+  {
+    id: "2",
+    title: "Dream Waves",
+    image: "https://picsum.photos/300?2"
+  },
+  {
+    id: "3",
+    title: "Soul Nights",
+    image: "https://picsum.photos/300?3"
+  }
+];
+
+module.exports = async (user) => {
+  const email = user.email_addresses[0].email_address;
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
+      pass: process.env.EMAIL_PASS
+    }
   });
 
-  const mailOptions = {
-    from: `"Frishta 🎵" <${process.env.EMAIL_USER}>`,
-    to: toEmail,
+  const html = `
+    <h2>Welcome to Frishta 🎵</h2>
+    <p>Tap a song to open it in the app</p>
+
+    ${SONGS.map(
+      s => `
+        <a href="frishta://song/${s.id}">
+          <img src="${s.image}" width="180" style="margin:10px;border-radius:8px" />
+        </a>
+      `
+    ).join("")}
+
+    <p>🎧 Happy Listening</p>
+  `;
+
+  await transporter.sendMail({
+    from: `"Frishta" <${process.env.EMAIL_USER}>`,
+    to: email,
     subject: "Welcome to Frishta 🎶",
-    html: `
-      <div style="font-family: Arial; padding: 20px;">
-        <h2>Hey 👋 Welcome to Frishta</h2>
-        <p>We're excited to have you on board.</p>
-        <h3>🔥 Explore our 3 Trending Songs</h3>
-        <ul>
-          <li>Midnight Vibes – Frishta Beats</li>
-          <li>Soulful Nights – DJ Noor</li>
-          <li>Dream Waves – Alpha Sounds</li>
-        </ul>
-        <p>Open the app and start listening 🎧</p>
-        <br />
-        <b>— Team Frishta</b>
-      </div>
-    `,
-  };
+    html
+  });
 
-  await transporter.sendMail(mailOptions);
+  console.log("✅ Welcome email sent to", email);
 };
-
-module.exports = sendWelcomeEmail;

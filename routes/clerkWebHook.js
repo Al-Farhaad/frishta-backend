@@ -4,39 +4,45 @@ const sendWelcomeEmail = require("../utils/sendWelcomeEmail");
 
 const router = express.Router();
 
-router.post("/clerk", async (req, res) => {
-  const payload = req.body;
-  const headers = req.headers;
+router.post(
+  "/",
+  express.raw({ type: "application/json" }),
+  async (req, res) => {
+    try {
+      const payload = req.body;
+      const headers = req.headers;
+      const secret = process.env.CLERK_WEBHOOK_SECRET;
 
-  const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
+      console.log("Secret length:", secret?.length);
+      console.log("Payload type:", typeof payload, "is Buffer:", Buffer.isBuffer(payload));
+    
 
-  let evt;
+      if (!secret) {
+        console.error("CLERK_WEBHOOK_SECRET is missing");
+        return res.status(500).json({ error: "Server configuration missing" });
+      }
 
-  try {
-    evt = wh.verify(
-      payload,
-      headers["svix-id"],
-      headers["svix-timestamp"],
-      headers["svix-signature"]
-    );
-  } catch (err) {
-    console.error("❌ Webhook verification failed:", err.message);
-    return res.status(400).send("Invalid signature");
-  }
+      const wh = new Webhook(secret);
 
-  console.log("🔔 Verified Clerk Event:", evt.type);
+      const evt = wh.verify(payload, {
+        "svix-id": headers["svix-id"],
+        "svix-timestamp": headers["svix-timestamp"],
+        "svix-signature": headers["svix-signature"],
+      });
 
-  if (evt.type === "user.created") {
-    const email =
-      evt.data.email_addresses?.[0]?.email_address;
+      console.log("Clerk Webhook Verified:", evt.type);
 
-    if (email) {
-      await sendWelcomeEmail(email);
-      console.log("✅ Welcome email sent to:", email);
+      if (evt.type === "user.created") {
+        await sendWelcomeEmail(evt.data);
+      }
+
+      return res.status(200).json({ success: true });
+      
+    } catch (err) {
+      console.error("Webhook verification failed:", err.message);
+      return res.status(400).json({ success: false, message: "Invalid signature" });
     }
   }
-
-  res.status(200).json({ ok: true });
-});
+);
 
 module.exports = router;
