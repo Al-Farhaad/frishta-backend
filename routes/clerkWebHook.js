@@ -15,6 +15,7 @@ router.post(
       const secret = process.env.CLERK_WEBHOOK_SECRET;
 
       // console.log("headers:", headers);
+      
       // console.log("Secret length:", secret?.length);
       // console.log("Payload type:", typeof payload, "is Buffer:", Buffer.isBuffer(payload));
     
@@ -38,7 +39,7 @@ router.post(
 
       console.log("checking evt.type:", evt.type);
       // if (evt.type === "user.created") {
-      
+
         const email = evt.data.email_addresses[0].email_address;
         console.log("sending email to new user:", email);
         await sendWelcomeEmail(email);

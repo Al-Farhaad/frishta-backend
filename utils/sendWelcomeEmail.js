@@ -12,6 +12,7 @@ const nodemailer = require("nodemailer");
       },
     });
 
+    
     console.log("🔐 Gmail user:", process.env.EMAIL_USER);
 
     await transporter.sendMail({
